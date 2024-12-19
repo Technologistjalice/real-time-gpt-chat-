@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .messages {
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+        .user-message, .bot-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .user-message {
+            background-color: #d9f7be;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #e2e2e2;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <input type="text" id="user_input" placeholder="Type a message..." autocomplete="off">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user_input').value;
+            if (userInput.trim() !== "") {
+                const messagesContainer = document.getElementById('messages');
+                
+                // Display user message
+                messagesContainer.innerHTML += `<div class="user-message">${userInput}</div>`;
+                document.getElementById('user_input').value = '';  // Clear input field
+
+                // Send message to Flask backend
+                fetch('/chat', {
+                    method: 'POST',
+                    body: new URLSearchParams({ 'user_input': userInput }),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Display bot response
+                    messagesContainer.innerHTML += `<div class="bot-message">${data.response}</div>`;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to the bottom
+                });
+            }
+        }
+    </script>
+</body>
+</html>
